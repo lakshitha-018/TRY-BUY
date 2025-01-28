@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Try and Buy</title>
+  <style>
+    #preview-container {
+      display: flex;
+      gap: 20px;
+    }
+    #user-photo, #output-image {
+      max-width: 300px;
+      max-height: 400px;
+      border: 1px solid #ccc;
+    }
+    .dress-option {
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .dress-option:hover {
+      border: 1px solid #007bff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Try and Buy</h1>
+  <div>
+    <h3>Step 1: Upload Your Photo</h3>
+    <input type="file" id="upload-photo" accept="image/*">
+    <img id="user-photo" alt="Your Photo">
+  </div>
+
+  <div>
+    <h3>Step 2: Select a Dress</h3>
+    <div id="dress-options">
+      <img class="dress-option" src="C:\Users\tadil\Desktop\pbl\red dress.jpg" alt="Dress 1" data-id="dress1">
+      <img class="dress-option" src="dress2.png" alt="Dress 2" data-id="dress2">
+    </div>
+  </div>
+
+  <div>
+    <h3>Preview</h3>
+    <div id="preview-container">
+      <canvas id="output-image"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const userPhotoInput = document.getElementById('upload-photo');
+    const userPhoto = document.getElementById('user-photo');
+    const dressOptions = document.querySelectorAll('.dress-option');
+    const canvas = document.getElementById('output-image');
+    const ctx = canvas.getContext('2d');
+
+    let userImage = null;
+    let selectedDress = null;
+
+    // Step 1: Load User Photo
+    userPhotoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        userPhoto.src = reader.result;
+        userImage = new Image();
+        userImage.src = reader.result;
+        userImage.onload = () => {
+          canvas.width = userImage.width;
+          canvas.height = userImage.height;
+          ctx.drawImage(userImage, 0, 0, canvas.width, canvas.height);
+        };
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 2: Select a Dress
+    dressOptions.forEach((dress) => {
+      dress.addEventListener('click', () => {
+        selectedDress = new Image();
+        selectedDress.src = dress.src;
+
+        selectedDress.onload = () => {
+          if (userImage) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Redraw the user photo
+            ctx.drawImage(userImage, 0, 0, canvas.width, canvas.height);
+
+            // Overlay the dress (adjust position as needed)
+            const dressWidth = canvas.width * 0.6; // Scale dress to fit
+            const dressHeight = selectedDress.height * (dressWidth / selectedDress.width);
+            const xPosition = canvas.width * 0.2; // Center the dress
+            const yPosition = canvas.height * 0.2; // Position near shoulders
+
+            ctx.drawImage(selectedDress, xPosition, yPosition, dressWidth, dressHeight);
+          } else {
+            alert('Please upload your photo first!');
+          }
+        };
+      });
+    });
+  </script>
+</body>
+</html>
